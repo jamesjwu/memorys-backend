@@ -78,7 +78,7 @@ class SearchIndex(object):
         for term in terms:
             (closest, num) = process.extractOne(term, self.index.keys())
             print closest, num
-            if num > 50:
+            if num > 90:
                 results = self.index[closest]
                 for img in results:
                     if img in users[user].imgurls:
