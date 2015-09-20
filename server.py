@@ -71,6 +71,7 @@ class SearchIndex(object):
         print tags
         return tags
 
+
     def search(self, search_term, user="default"):
         terms = search_term.split()
         counts = defaultdict(int)
@@ -101,6 +102,7 @@ all_images = reduce(lambda x,y: x | y, index.index.values())
 with open('users.txt', 'r') as f:
     users = pickle.load(f)
     f.close()
+print "wat"
 
 users["default"].imgurls = all_images
 
