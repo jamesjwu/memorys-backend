@@ -1,6 +1,7 @@
 import SimpleHTTPServer
 import SocketServer
 import os
+import json
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from collections import defaultdict
 from clarifai.client import ClarifaiApi
@@ -49,6 +50,7 @@ class SearchIndex(object):
     def tag_photo(self, image):
         result = self.clarifai.tag_image_urls(image)
         tags = result['results'][0]['result']['tag']['classes']
+        print tags
         return tags
 
     def search(self, search_term):
@@ -92,7 +94,7 @@ class MemoriesHandler(BaseHTTPRequestHandler):
         elif(parsed.path == "/search"):
             args = self.parse_args(self.path)
             total = index.search(args.get('term')[0])
-            self.wfile.write([x for (x,y) in total])
+            json.dump([x for (x,y) in total], self.wfile)
 
 
         
