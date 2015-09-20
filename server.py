@@ -102,7 +102,7 @@ def run():
  
   #ip and port of servr
   #by default http server port is 80
-  server_address = ('localhost', int(os.environ.get("PORT", 3000)))
+  server_address = ('0.0.0.0', int(os.environ.get("PORT", 3000)))
   httpd = HTTPServer(server_address, MemoriesHandler)
   print('http server is running...')
   httpd.serve_forever()
