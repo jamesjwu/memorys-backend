@@ -1,0 +1,8 @@
+{
+  "engines": {
+    "python": "2.7.10"
+  },
+  "scripts": {
+    "start": "python server.py"
+  }
+}
