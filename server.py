@@ -24,6 +24,7 @@ class User(object):
         self.name = name
         self.imgurls = set()
 
+
     def addImageToUser(self, img):
         self.imgurls.add(img)
 
@@ -97,10 +98,9 @@ with open('urls.txt', 'r') as f:
 all_images = reduce(lambda x,y: x | y, index.index.values())
 
 
-
-users = {
-    "default": User("default")
-}
+with open('users.txt', 'r') as f:
+    users = pickle.load(f)
+    f.close()
 
 users["default"].imgurls = all_images
 
@@ -125,6 +125,8 @@ class MemoriesHandler(BaseHTTPRequestHandler):
             if 'user' in args: 
                 if args['user'][0] not in users:
                     users[args['user'][0]] = User(args['user'])
+                    with open('users.txt', 'a+') as f:
+                        pickle.dump(users, f)
             else:
                 args['user'] = ['default']
             index.add_image(args.get('imageURL')[0], user=args['user'][0])
@@ -134,6 +136,8 @@ class MemoriesHandler(BaseHTTPRequestHandler):
             if 'user' in args: 
                 if args['user'][0] not in users:
                     users[args['user'][0]] = User(args['user'][0])
+                    with open('users.txt', 'a+') as f:
+                        pickle.dump(users, f)
             else:
                 args['user'] = ['default']
 
