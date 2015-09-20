@@ -33,10 +33,11 @@ class SearchIndex(object):
     def add_image(self, imgurl):
         if imgurl in all_images:
             return
+        all_images.add(imgurl)
         tags = self.tag_photo(imgurl)
         for tag in tags:
             self.index[tag].add(imgurl)
-
+        
         with open('urls.txt', 'w') as f:
             pickle.dump(self.index, f)
             f.close()
