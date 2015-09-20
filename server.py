@@ -12,6 +12,7 @@ except:
     import pickle
 
 import operator
+from fuzzywuzzy import process
 
 os.environ["CLARIFAI_APP_SECRET"] = "Jf6Sm2o8bY-MopRVJUjPeTzfJvTPtNC9nW20rVoL"
 os.environ["CLARIFAI_APP_ID"] = "BQv24SbZOmKS-LE1I7z_xXc01AX32luGBy84OKDI"
@@ -73,10 +74,13 @@ class SearchIndex(object):
         terms = search_term.split()
         counts = defaultdict(int)
         for term in terms:
-            results = self.index[term]
-            for img in results:
-                if img in users[user].imgurls:
-                    counts[img] += 1
+            (closest, num) = process.extractOne(term, self.index.keys())
+            print closest, num
+            if num > 50:
+                results = self.index[closest]
+                for img in results:
+                    if img in users[user].imgurls:
+                        counts[img] += 1
         sorted_counts = sorted(counts.items(), key=operator.itemgetter(1))
 
         
@@ -130,7 +134,7 @@ class MemoriesHandler(BaseHTTPRequestHandler):
                 if args['user'][0] not in users:
                     users[args['user'][0]] = User(args['user'][0])
             else:
-                args['user'] = 'default'
+                args['user'] = ['default']
 
             total = index.search(args.get('term')[0], user=args['user'][0])
             json.dump([x for (x,y) in total], self.wfile)
