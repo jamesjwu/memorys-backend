@@ -121,7 +121,7 @@ class MemoriesHandler(BaseHTTPRequestHandler):
                 if args['user'][0] not in users:
                     users[args['user'][0]] = User(args['user'])
             else:
-                args['user'] = 'default'
+                args['user'] = ['default']
             index.add_image(args.get('imageURL')[0], user=args['user'][0])
         
         elif(parsed.path == "/search"):
