@@ -15,8 +15,19 @@ import operator
 
 os.environ["CLARIFAI_APP_SECRET"] = "Jf6Sm2o8bY-MopRVJUjPeTzfJvTPtNC9nW20rVoL"
 os.environ["CLARIFAI_APP_ID"] = "BQv24SbZOmKS-LE1I7z_xXc01AX32luGBy84OKDI"
-        
 
+class User(object):
+    """Represents a single user"""
+    def __init__(self, name):
+        """"""
+        self.name = name
+        self.imgurls = set()
+
+    def addImageToUser(self, img):
+        self.imgurls.add(img)
+
+    def __repr__(self):
+        return self.imgurls.__str__()
 
 class SearchIndex(object):
     """Index search creator tool thing blah cool"""
@@ -30,10 +41,14 @@ class SearchIndex(object):
         self.index = defaultdict(set)
         self.image_list = image_list
 
-    def add_image(self, imgurl):
+    def add_image(self, imgurl, user="default"):
         if imgurl in all_images:
+            users[user].addImageToUser(imgurl)
             return
         all_images.add(imgurl)
+
+        users[user].addImageToUser(imgurl)
+
         tags = self.tag_photo(imgurl)
         for tag in tags:
             self.index[tag].add(imgurl)
@@ -54,15 +69,19 @@ class SearchIndex(object):
         print tags
         return tags
 
-    def search(self, search_term):
+    def search(self, search_term, user="default"):
         terms = search_term.split()
         counts = defaultdict(int)
         for term in terms:
             results = self.index[term]
             for img in results:
-                counts[img] += 1
+                if img in users[user].imgurls:
+                    counts[img] += 1
         sorted_counts = sorted(counts.items(), key=operator.itemgetter(1))
-        return sorted_counts
+
+        
+        print users
+        return sorted_counts 
 
             
 index = SearchIndex([])  
@@ -71,6 +90,14 @@ with open('urls.txt', 'r') as f:
     f.close()
 
 all_images = reduce(lambda x,y: x | y, index.index.values())
+
+
+
+users = {
+    "default": User("default")
+}
+
+users["default"].imgurls = all_images
 
 
 class MemoriesHandler(BaseHTTPRequestHandler):
@@ -90,11 +117,22 @@ class MemoriesHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if(parsed.path == "/add"):
             args = self.parse_args(self.path)
-            index.add_image(args.get('imageURL')[0])
+            if 'user' in args: 
+                if args['user'][0] not in users:
+                    users[args['user'][0]] = User(args['user'])
+            else:
+                args['user'] = 'default'
+            index.add_image(args.get('imageURL')[0], user=args['user'][0])
         
         elif(parsed.path == "/search"):
             args = self.parse_args(self.path)
-            total = index.search(args.get('term')[0])
+            if 'user' in args: 
+                if args['user'][0] not in users:
+                    users[args['user'][0]] = User(args['user'][0])
+            else:
+                args['user'] = 'default'
+
+            total = index.search(args.get('term')[0], user=args['user'][0])
             json.dump([x for (x,y) in total], self.wfile)
 
 
