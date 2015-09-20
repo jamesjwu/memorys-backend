@@ -93,6 +93,7 @@ with open('urls.txt', 'r') as f:
     index.index = pickle.load(f)
     f.close()
 
+
 all_images = reduce(lambda x,y: x | y, index.index.values())
 
 
